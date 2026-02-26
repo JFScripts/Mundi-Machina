@@ -1,12 +1,16 @@
 package Mundo;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+
+import Enums.Biomas;
 
 public class Mundo {
     private int widht;
     private int height;
     private int linhaEquador;
-    private Celula[][] matrizMundo;
+    private MacroChunk[][] matrizMundo;
     private long seedMundo;
     private Random geraracaoAleatoria;
 
@@ -15,7 +19,7 @@ public class Mundo {
         this.geraracaoAleatoria = new Random(this.seedMundo);
         this.widht = widht;
         this.height = height;
-        this.matrizMundo = new Celula[height][widht];
+        this.matrizMundo = new MacroChunk[height][widht];
         this.linhaEquador = geraracaoAleatoria.nextInt((height) + 1);
 
     }
@@ -33,7 +37,7 @@ public class Mundo {
                 if(numero < valorTerra){
                     valorCelula = 1;
                 }
-                matrizMundo[i][j] = new Celula(valorCelula);
+                matrizMundo[i][j] = new MacroChunk(valorCelula, this.seedMundo, i, j);
             }
         }
 
@@ -43,6 +47,11 @@ public class Mundo {
         gerarAlturas(qntErosao);
         adicionarTemperatura();
         adicionarUmidade(qntUmidade);
+        for(int i = 0; i < this.matrizMundo.length; i ++){
+            for(int j = 0; j < this.matrizMundo[i].length; j ++){
+                this.matrizMundo[i][j].setBioma(distribuirBiomas(i, j));
+            }
+        }
     }
 
     private void suavizarMundo(){
@@ -232,6 +241,36 @@ public class Mundo {
         return construirString.toString();
     }
 
+    private Biomas distribuirBiomas(int x, int y){
+        List<Biomas> candidatos = new ArrayList<>();
+        double temperaturaLocal = this.matrizMundo[x][y].getTemperatura();
+        double umidadeLocal = this.matrizMundo[x][y].getUmidade();
+        double alturaLocal = this.matrizMundo[x][y].getAltura();
+        if(alturaLocal  <= 0){
+            return Biomas.OCEANO;
+        }
+        for(Biomas bioma : Biomas.values()){
+            if(bioma == Biomas.OCEANO){
+                continue;
+            }
+            if(temperaturaLocal >= bioma.getTempMin() && temperaturaLocal <= bioma.getTempMax()){
+                if(umidadeLocal >= bioma.getUmidMin() && umidadeLocal <= bioma.getUmidMax()){
+                    candidatos.add(bioma);
+                }
+            }
+        }
+
+        if(candidatos.isEmpty()){
+            return Biomas.PLANICIE;
+        }
+        if(candidatos.size() < 2){
+            return candidatos.get(0);
+        } else {
+            Random randomLocal = new Random(this.matrizMundo[x][y].getSemente());
+            return candidatos.get(randomLocal.nextInt(candidatos.size()));
+        }
+    }
+
     public int getWidht() {
         return widht;
     }
@@ -240,7 +279,7 @@ public class Mundo {
         return height;
     }
 
-    public Celula[][] getMatrizMundo() {
+    public MacroChunk[][] getMatrizMundo() {
         return matrizMundo;
     }
 

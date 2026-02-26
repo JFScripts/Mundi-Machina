@@ -10,10 +10,12 @@ public class Main {
             String altura = "Imagens/MapaAltura_"+i+".png";
             String temperatura = "Imagens/MapaTemperatura_"+i+".png";
             String umidade = "Imagens/MapaUmidade_"+i+".png";
-            //System.out.println(mundo.exportarMundo());
+            String bioma = "Imagens/MapaBioma_"+i+".png"; 
+            
             GerarImagemMundo.gerarHeightMap(mundo, altura);
             GerarImagemMundo.gerarTemperatureMap(mundo, temperatura);
             GerarImagemMundo.gerarHumidityMap(mundo, umidade);
+            GerarImagemMundo.gerarBiomeMap(mundo, bioma);
         }
     }
 }

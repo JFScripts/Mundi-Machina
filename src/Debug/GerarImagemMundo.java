@@ -5,7 +5,8 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import Mundo.Celula;
+import Enums.Biomas;
+import Mundo.MacroChunk;
 import Mundo.Mundo;
 
 import java.awt.Color;
@@ -14,7 +15,7 @@ public class GerarImagemMundo {
     public static void gerarHeightMap(Mundo mundo, String caminho){
         int widht = mundo.getWidht();
         int height = mundo.getHeight();
-        Celula[][] matrizMundo = mundo.getMatrizMundo();
+        MacroChunk[][] matrizMundo = mundo.getMatrizMundo();
         BufferedImage heightMap = new BufferedImage(widht, height, BufferedImage.TYPE_INT_RGB);
         File arquivoDeSaida = new File(caminho);
         
@@ -38,7 +39,7 @@ public class GerarImagemMundo {
     public static void gerarTemperatureMap(Mundo mundo, String caminho){
         int widht = mundo.getWidht();
         int height = mundo.getHeight();
-        Celula[][] matrizMundo = mundo.getMatrizMundo();
+        MacroChunk[][] matrizMundo = mundo.getMatrizMundo();
         BufferedImage heightMap = new BufferedImage(widht, height, BufferedImage.TYPE_INT_RGB);
         File arquivoDeSaida = new File(caminho);
         
@@ -61,7 +62,7 @@ public class GerarImagemMundo {
     public static void gerarHumidityMap(Mundo mundo, String caminho){
         int widht = mundo.getWidht();
         int height = mundo.getHeight();
-        Celula[][] matrizMundo = mundo.getMatrizMundo();
+        MacroChunk[][] matrizMundo = mundo.getMatrizMundo();
         BufferedImage heightMap = new BufferedImage(widht, height, BufferedImage.TYPE_INT_RGB);
         File arquivoDeSaida = new File(caminho);
         
@@ -81,6 +82,30 @@ public class GerarImagemMundo {
         }
     }
     
+    public static void gerarBiomeMap(Mundo mundo, String caminho){
+        int widht = mundo.getWidht();
+        int height = mundo.getHeight();
+        MacroChunk[][] matrizMundo = mundo.getMatrizMundo();
+        BufferedImage heightMap = new BufferedImage(widht, height, BufferedImage.TYPE_INT_RGB);
+        File arquivoDeSaida = new File(caminho);
+
+        
+        for(int i = 0; i < widht; i ++){
+            for(int j = 0; j < height; j ++){
+                Biomas biomaAtual = matrizMundo[j][i].getBioma();
+                Color corAtual = biomaAtual.getBiomaCor();
+                heightMap.setRGB(i, j, corAtual.getRGB());
+            }
+        }
+
+        try {
+            ImageIO.write(heightMap, "png", arquivoDeSaida);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
     private static Color obterCorHeightMap(int altura) {
         switch (altura) {
             case 0: return new Color(15, 94, 156);   // Oceano (Azul Profundo)
