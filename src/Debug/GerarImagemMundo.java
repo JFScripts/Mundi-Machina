@@ -1,9 +1,5 @@
 package Debug;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
 
 import Enums.Biomas;
 import Mundo.MacroChunk;
@@ -12,114 +8,87 @@ import Mundo.Mundo;
 import java.awt.Color;
 
 public class GerarImagemMundo {
-    public static void gerarHeightMap(Mundo mundo, String caminho){
+
+
+    public static BufferedImage gerarHeightMap(Mundo mundo){
         int widht = mundo.getWidht();
         int height = mundo.getHeight();
         MacroChunk[][] matrizMundo = mundo.getMatrizMundo();
         BufferedImage heightMap = new BufferedImage(widht, height, BufferedImage.TYPE_INT_RGB);
-        File arquivoDeSaida = new File(caminho);
         
         for(int i = 0; i < widht; i ++){
             for(int j = 0; j < height; j ++){
                 double alturaAtual = matrizMundo[j][i].getAltura();
-                int alturaArredondada = (int) Math.round(alturaAtual);
-                Color corAtual = obterCorHeightMap(alturaArredondada);
+                
+                Color corAtual = obterCorHeightMap(alturaAtual);
                 heightMap.setRGB(i, j, corAtual.getRGB());
             }
         }
 
-        try {
-            ImageIO.write(heightMap, "png", arquivoDeSaida);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        return heightMap;
+        
     }
 
-    public static void gerarTemperatureMap(Mundo mundo, String caminho){
+    public static BufferedImage gerarTemperatureMap(Mundo mundo){
         int widht = mundo.getWidht();
         int height = mundo.getHeight();
         MacroChunk[][] matrizMundo = mundo.getMatrizMundo();
-        BufferedImage heightMap = new BufferedImage(widht, height, BufferedImage.TYPE_INT_RGB);
-        File arquivoDeSaida = new File(caminho);
-        
+        BufferedImage temperatureMap = new BufferedImage(widht, height, BufferedImage.TYPE_INT_RGB);
+
         for(int i = 0; i < widht; i ++){
             for(int j = 0; j < height; j ++){
                 double temperaturaAtual = matrizMundo[j][i].getTemperatura();
                 Color corAtual = obterCorTemperatureMap(temperaturaAtual);
-                heightMap.setRGB(i, j, corAtual.getRGB());
+                temperatureMap.setRGB(i, j, corAtual.getRGB());
             }
         }
 
-        try {
-            ImageIO.write(heightMap, "png", arquivoDeSaida);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        return temperatureMap;
     }
 
-    public static void gerarHumidityMap(Mundo mundo, String caminho){
+    public static BufferedImage gerarHumidityMap(Mundo mundo){
         int widht = mundo.getWidht();
         int height = mundo.getHeight();
         MacroChunk[][] matrizMundo = mundo.getMatrizMundo();
-        BufferedImage heightMap = new BufferedImage(widht, height, BufferedImage.TYPE_INT_RGB);
-        File arquivoDeSaida = new File(caminho);
+        BufferedImage humidityMap = new BufferedImage(widht, height, BufferedImage.TYPE_INT_RGB);
         
         for(int i = 0; i < widht; i ++){
             for(int j = 0; j < height; j ++){
                 double umidadeAtual = matrizMundo[j][i].getUmidade();
                 Color corAtual = obterCorHumidityMap(umidadeAtual);
-                heightMap.setRGB(i, j, corAtual.getRGB());
+                humidityMap.setRGB(i, j, corAtual.getRGB());
             }
         }
 
-        try {
-            ImageIO.write(heightMap, "png", arquivoDeSaida);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        return humidityMap;
     }
     
-    public static void gerarBiomeMap(Mundo mundo, String caminho){
+    public static BufferedImage gerarBiomeMap(Mundo mundo){
         int widht = mundo.getWidht();
         int height = mundo.getHeight();
         MacroChunk[][] matrizMundo = mundo.getMatrizMundo();
-        BufferedImage heightMap = new BufferedImage(widht, height, BufferedImage.TYPE_INT_RGB);
-        File arquivoDeSaida = new File(caminho);
+        BufferedImage biomeMap = new BufferedImage(widht, height, BufferedImage.TYPE_INT_RGB);
 
         
         for(int i = 0; i < widht; i ++){
             for(int j = 0; j < height; j ++){
                 Biomas biomaAtual = matrizMundo[j][i].getBioma();
                 Color corAtual = biomaAtual.getBiomaCor();
-                heightMap.setRGB(i, j, corAtual.getRGB());
+                biomeMap.setRGB(i, j, corAtual.getRGB());
             }
         }
 
-        try {
-            ImageIO.write(heightMap, "png", arquivoDeSaida);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        return biomeMap;
     }
 
-    private static Color obterCorHeightMap(int altura) {
-        switch (altura) {
-            case 0: return new Color(15, 94, 156);   // Oceano (Azul Profundo)
-            case 1: return new Color(235, 225, 175); // Areia da Praia
-            case 2: return new Color(153, 204, 113); // Planície Clara
-            case 3: return new Color(104, 165, 85);  // Campo Verde
-            case 4: return new Color(63, 122, 58);   // Floresta
-            case 5: return new Color(125, 105, 84);  // Colina de Terra (Marrom)
-            case 6: return new Color(140, 132, 125); // Montanha Base (Cinza Escuro)
-            case 7: return new Color(166, 161, 156); // Montanha Média (Cinza)
-            case 8: return new Color(199, 196, 193); // Pico Rochoso (Cinza Claro)
-            case 9: return new Color(255, 255, 255); // Neve (Branco)
-            default: return new Color(0, 0, 0);      // Cor de fallback (Preto) em caso de erro
-        }
+    private static Color obterCorHeightMap(double altura) {
+        double VALORMINIMO = 0;
+        double VALORMAXIMO = 9;
+
+        double alturaNormalizada = (altura - VALORMINIMO) / (VALORMAXIMO - VALORMINIMO);
+        int corCinza = (int) Math.round(alturaNormalizada * 255);
+        return new Color(corCinza, corCinza, corCinza);
+        
     }
 
     private static Color obterCorTemperatureMap(double temperatura) {
