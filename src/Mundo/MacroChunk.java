@@ -12,6 +12,10 @@ public class MacroChunk {
     private double temperatura;
     private double umidade;
     private Biomas bioma;
+
+    private double pressaoAr;
+    private double pressaoX;
+    private double pressaoY;
     
     public MacroChunk(double altura, long sementeMundo, int xMundo, int yMundo) {
         this.altura = altura;
@@ -21,6 +25,9 @@ public class MacroChunk {
         this.coordenadaMundialY = yMundo;
         this.semente = GerenciadorDeSemente.gerarSementeMacroChunk(sementeMundo, xMundo, yMundo);
         this.bioma = null;
+        this.pressaoAr = 0;
+        this.pressaoX = 0;
+        this.pressaoY = 0;
     }
     public MacroChunk(double altura, double temperatura, double umidade,long sementeMundo, int xMundo, int yMundo, Biomas bioma) {
         this.altura = altura;
@@ -76,6 +83,24 @@ public class MacroChunk {
     }
     public void setBioma(Biomas bioma) {
         this.bioma = bioma;
+    }
+    public double getPressaoAr() {
+        return pressaoAr;
+    }
+    public void setPressaoAr(double pressaoAr) {
+        this.pressaoAr = pressaoAr;
+    }
+    public double getPressaoX() {
+        return pressaoX;
+    }
+    public void setPressaoX(double pressaoX) {
+        this.pressaoX = pressaoX;
+    }
+    public double getPressaoY() {
+        return pressaoY;
+    }
+    public void setPressaoY(double pressaoY) {
+        this.pressaoY = pressaoY;
     }
 
 }

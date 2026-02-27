@@ -50,8 +50,10 @@ public class Mundo {
         for(int i = 0; i < this.matrizMundo.length; i ++){
             for(int j = 0; j < this.matrizMundo[i].length; j ++){
                 this.matrizMundo[i][j].setBioma(distribuirBiomas(i, j));
+                calcularPressao(i, j);
             }
         }
+        calcularVentos();
     }
 
     private void suavizarMundo(){
@@ -229,6 +231,7 @@ public class Mundo {
         
         return Math.max(0, umidadePenalidade);
     }
+    
     public String exportarMundo(){
         StringBuilder construirString = new StringBuilder();
         DecimalFormat df = new DecimalFormat("#");
@@ -268,6 +271,56 @@ public class Mundo {
         } else {
             Random randomLocal = new Random(this.matrizMundo[x][y].getSemente());
             return candidatos.get(randomLocal.nextInt(candidatos.size()));
+        }
+    }
+
+    private void calcularPressao(int x, int y){
+        double temperaturalLocal = this.matrizMundo[x][y].getTemperatura();
+        double pesoTemperatura = 0.6;
+        double alturaLocal = this.matrizMundo[x][y].getAltura();
+        double pesoAltura = 0.4;
+        double alturaMaxima = 9;
+        double pressao = 1 - (pesoTemperatura * temperaturalLocal) - (pesoAltura * (alturaLocal/alturaMaxima));
+        this.matrizMundo[x][y].setPressaoAr(pressao);
+    }
+
+    private void calcularVentos(){
+        double pressaoCima = 0;
+        double pressaoBaixo = 0;
+        double pressaoEsquerda = 0;
+        double pressaoDireita = 0;
+
+        for(int x = 0; x < this.matrizMundo.length; x ++){
+            for(int y = 0; y < this.matrizMundo[x].length; y ++){
+                if (x - 1 >= 0) {
+                    pressaoCima = this.matrizMundo[x - 1][y].getPressaoAr();
+                } else {
+                    pressaoCima = this.matrizMundo[x][y].getPressaoAr();
+                }
+
+                if (x + 1 < this.height) {
+                    pressaoBaixo = this.matrizMundo[x + 1][y].getPressaoAr();
+                } else {
+                    pressaoBaixo = this.matrizMundo[x][y].getPressaoAr();
+                }
+
+                if (y - 1 >= 0) {
+                    pressaoEsquerda = this.matrizMundo[x][y - 1].getPressaoAr();
+                } else {
+                    pressaoEsquerda = this.matrizMundo[x][y].getPressaoAr();
+                }
+
+                if (y + 1 < this.widht) {
+                    pressaoDireita = this.matrizMundo[x][y + 1].getPressaoAr();
+                } else {
+                    pressaoDireita = this.matrizMundo[x][y].getPressaoAr();
+                }
+
+                double pressaoResultanteX = pressaoEsquerda - pressaoDireita;
+                double pressaoResultanteY = pressaoCima - pressaoBaixo; 
+                this.matrizMundo[x][y].setPressaoX(pressaoResultanteX);
+                this.matrizMundo[x][y].setPressaoY(pressaoResultanteY);
+            }
         }
     }
 

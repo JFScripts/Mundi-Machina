@@ -16,7 +16,7 @@ import Mundo.Mundo;
 public class Main {
 
     static int indiceAtual = 0;
-    static BufferedImage[] mapas = new BufferedImage[4];
+    static BufferedImage[] mapas = new BufferedImage[6];
     static PainelMapa monitor = new PainelMapa();
     static Mundo mundo;
     static JLabel seed = new JLabel("");
@@ -25,8 +25,7 @@ public class Main {
     static JLabel umidade = new JLabel("");
     static JLabel bioma = new JLabel("");
     static JLabel seedChunk = new JLabel("");
-
-    
+    static JLabel pressaoChunk = new JLabel("");
 
     public static void main(String[] args) {
         mundo = new Mundo(100, 100);
@@ -36,6 +35,8 @@ public class Main {
         mapas[1] = GerarImagemMundo.gerarHeightMap(mundo);
         mapas[2] = GerarImagemMundo.gerarHumidityMap(mundo);
         mapas[3] = GerarImagemMundo.gerarTemperatureMap(mundo);
+        mapas[4] = GerarImagemMundo.gerarAirPressureMap(mundo);
+        mapas[5] = GerarImagemMundo.gerarWindMap(mundo);
 
         JFrame janela = new JFrame("Tela de Debug");
         janela.setLayout(new BorderLayout());
@@ -50,7 +51,7 @@ public class Main {
         proximaImagem.addActionListener(e -> {
             
             indiceAtual++;
-            if (indiceAtual > 3) {
+            if (indiceAtual > mapas.length - 1) {
                 indiceAtual = 0; 
             }
             
@@ -65,6 +66,9 @@ public class Main {
             mapas[1] = GerarImagemMundo.gerarHeightMap(mundo);
             mapas[2] = GerarImagemMundo.gerarHumidityMap(mundo);
             mapas[3] = GerarImagemMundo.gerarTemperatureMap(mundo);
+            mapas[4] = GerarImagemMundo.gerarAirPressureMap(mundo);
+            mapas[5] = GerarImagemMundo.gerarWindMap(mundo);
+
             monitor.setImage(mapas[indiceAtual]);
             seed.setText("Seed Atual: " + mundo.getSeedMundo());
         });
@@ -81,6 +85,10 @@ public class Main {
             exportarMapa(mapas[1], caminhoPasta + "/Mapa_Altura_"+seedMundo);
             exportarMapa(mapas[2], caminhoPasta + "/Mapa_Umidade_"+seedMundo);
             exportarMapa(mapas[3], caminhoPasta + "/Mapa_Temperatura_"+seedMundo);
+            exportarMapa(mapas[4], caminhoPasta + "/Mapa_PressaoAr_"+seedMundo);
+            exportarMapa(mapas[5], caminhoPasta + "/Mapa_Vento_"+seedMundo);
+
+
         });
 
 
@@ -99,6 +107,7 @@ public class Main {
         monitoramento.add(umidade);
         monitoramento.add(bioma);
         monitoramento.add(seedChunk);
+        monitoramento.add(pressaoChunk);
 
         janela.add(monitoramento, BorderLayout.WEST);
         janela.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -124,6 +133,7 @@ public class Main {
                     altura.setText(String.format("Altura do Chunck: %.2f", chunckClicado.getAltura()));
                     temperatura.setText(String.format("Temperatura do Chunck: %.2f", chunckClicado.getTemperatura()));
                     umidade.setText(String.format("Umidade do Chunck: %.2f", chunckClicado.getUmidade()));
+                    pressaoChunk.setText(String.format("Pressao do Chunck: %.2f", chunckClicado.getPressaoAr()));
                     bioma.setText("Bioma do Chunck: " + chunckClicado.getBioma());
                     
                 } else {
@@ -132,6 +142,7 @@ public class Main {
                     temperatura.setText("");
                     umidade.setText("");
                     bioma.setText("");
+                    pressaoChunk.setText("");
                 }
             }
         });

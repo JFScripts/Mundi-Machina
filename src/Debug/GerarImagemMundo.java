@@ -81,6 +81,41 @@ public class GerarImagemMundo {
         return biomeMap;
     }
 
+    public static BufferedImage gerarAirPressureMap(Mundo mundo){
+        int widht = mundo.getWidht();
+        int height = mundo.getHeight();
+        MacroChunk[][] matrizMundo = mundo.getMatrizMundo();
+        BufferedImage airPressureMap = new BufferedImage(widht, height, BufferedImage.TYPE_INT_RGB);
+
+        
+        for(int i = 0; i < widht; i ++){
+            for(int j = 0; j < height; j ++){
+                double pressaoAtual = matrizMundo[j][i].getPressaoAr();
+                Color corAtual = obterCorAirPressureMap(pressaoAtual);
+                airPressureMap.setRGB(i, j, corAtual.getRGB());
+            }
+        }
+
+        return airPressureMap;
+    }
+
+    public static BufferedImage gerarWindMap(Mundo mundo){
+        int widht = mundo.getWidht();
+        int height = mundo.getHeight();
+        MacroChunk[][] matrizMundo = mundo.getMatrizMundo();
+        BufferedImage windMap = new BufferedImage(widht, height, BufferedImage.TYPE_INT_RGB);
+
+        
+        for(int i = 0; i < widht; i ++){
+            for(int j = 0; j < height; j ++){
+                Color corAtual = obterCorWindMap(matrizMundo[j][i].getPressaoX(), matrizMundo[j][i].getPressaoY());
+                windMap.setRGB(i, j, corAtual.getRGB());
+            }
+        }
+
+        return windMap;
+    }
+
     private static Color obterCorHeightMap(double altura) {
         double VALORMINIMO = 0;
         double VALORMAXIMO = 9;
@@ -124,5 +159,38 @@ public class GerarImagemMundo {
         
         // Seca extrema (Sombra de chuva / Deserto)
         return new Color(255, 255, 255);                      // Branco Puro
+    }
+
+    private static Color obterCorAirPressureMap(double pressao) {
+        double pressaoNormalizada = Math.max(0.0, Math.min(1, pressao));
+        int vermelho, verde, azul;
+
+        if (pressaoNormalizada >= 0.5) {
+            double intensidade = (pressaoNormalizada - 0.5) * 2; 
+            
+            vermelho = (int) (255 * (1 - intensidade)); 
+            verde = (int) (255 * (1 - intensidade)); 
+            azul = 255;                               
+        } else {
+            
+            double intensidade = pressaoNormalizada * 2; 
+            
+            vermelho = 255;                               
+            verde = (int) (255 * intensidade);         
+            azul = (int) (255 * intensidade);         
+        }
+        
+        return new Color(vermelho, verde, azul);
+    }
+
+    private static Color obterCorWindMap(double x, double y){
+        double xx = x * x;
+        double yy = y * y;
+        double intensidade = Math.sqrt(yy + xx) * 5;
+        intensidade = Math.min(intensidade, 1);
+        if(intensidade < 0.2){return new Color(0, 0 , 0);}
+        if(intensidade < 0.5){return new Color(57, 255 , 20);}
+        if(intensidade < 0.8){return new Color(0, 255 , 0);}
+        else {return new Color(255, 255 , 255);}
     }
 }
