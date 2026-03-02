@@ -29,6 +29,7 @@ public class MacroChunk {
         this.pressaoX = 0;
         this.pressaoY = 0;
     }
+
     public MacroChunk(double altura, double temperatura, double umidade,long sementeMundo, int xMundo, int yMundo, Biomas bioma) {
         this.altura = altura;
         this.temperatura = temperatura;
@@ -37,6 +38,28 @@ public class MacroChunk {
         this.coordenadaMundialY = yMundo;
         this.semente = GerenciadorDeSemente.gerarSementeMacroChunk(sementeMundo, xMundo, yMundo);
         this.bioma = bioma;
+    }
+
+    public String gerarRelatorio() {
+        return String.format(
+            "Semente do Chunk: %d | X: %d | Y: %d%n" +
+            "Altura: %.2f%n" +
+            "Temperatura: %.2f%n" +
+            "Umidade: %.2f%n" +
+            "Pressão do Ar: %.2f%n" +
+            "Ar X: %.2f | Ar Y %.2f%n"+
+            "Bioma: %s", 
+            this.semente,
+            this.coordenadaMundialX,
+            this.coordenadaMundialY, 
+            this.altura, 
+            this.temperatura, 
+            this.umidade,
+            this.pressaoAr,
+            this.pressaoX,
+            this.pressaoY,
+            this.bioma
+        );
     }
 
     public double getAltura() {
