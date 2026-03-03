@@ -16,12 +16,12 @@ public class HeightMap implements gerarImagem{
         MacroChunk[][] matrizMundo = mundo.getMatrizMundo();
         BufferedImage heightMap = new BufferedImage(widht, height, BufferedImage.TYPE_INT_RGB);
         
-        for(int i = 0; i < widht; i ++){
-            for(int j = 0; j < height; j ++){
-                double alturaAtual = matrizMundo[j][i].getAltura();
+        for(int x = 0; x < widht; x ++){
+            for(int y = 0; y < height; y ++){
+                double alturaAtual = matrizMundo[x][y].getAltura();
                 
                 Color corAtual = getMapColor(alturaAtual);
-                heightMap.setRGB(i, j, corAtual.getRGB());
+                heightMap.setRGB(x, y, corAtual.getRGB());
             }
         }
 

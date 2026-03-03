@@ -9,18 +9,21 @@ public class MacroChunk {
     private int coordenadaMundialX;
     private int coordenadaMundialY;
     private double altura;
-    private double temperatura;
+    private double temperaturaBase;
     private double umidade;
     private Biomas bioma;
 
     private double pressaoAr;
     private double pressaoX;
     private double pressaoY;
+
+    private double temperaturaLocal;
     
     public MacroChunk(double altura, long sementeMundo, int yMundo, int xMundo) {
         this.altura = altura;
-        this.temperatura = 0;
+        this.temperaturaBase = 0;
         this.umidade = 0;
+        this.temperaturaLocal = temperaturaBase;
         this.coordenadaMundialX = xMundo;
         this.coordenadaMundialY = yMundo;
         this.semente = GerenciadorDeSemente.gerarSementeMacroChunk(sementeMundo, xMundo, yMundo);
@@ -30,10 +33,11 @@ public class MacroChunk {
         this.pressaoY = 0;
     }
 
-    public MacroChunk(double altura, double temperatura, double umidade,long sementeMundo, int xMundo, int yMundo, Biomas bioma) {
+    public MacroChunk(double altura, double temperaturaBase, double umidade,long sementeMundo, int xMundo, int yMundo, Biomas bioma, double temperaturaLocal) {
         this.altura = altura;
-        this.temperatura = temperatura;
+        this.temperaturaBase = temperaturaBase;
         this.umidade = umidade;
+        this.temperaturaLocal = temperaturaLocal;
         this.coordenadaMundialX = xMundo;
         this.coordenadaMundialY = yMundo;
         this.semente = GerenciadorDeSemente.gerarSementeMacroChunk(sementeMundo, xMundo, yMundo);
@@ -44,7 +48,7 @@ public class MacroChunk {
         return String.format(
             "Semente do Chunk: %d | X: %d | Y: %d%n" +
             "Altura: %.2f%n" +
-            "Temperatura: %.2f%n" +
+            "temperaturaBase: %.2f%n" +
             "Umidade: %.2f%n" +
             "Pressão do Ar: %.2f%n" +
             "Ar X: %.2f | Ar Y %.2f%n"+
@@ -53,7 +57,7 @@ public class MacroChunk {
             this.coordenadaMundialX,
             this.coordenadaMundialY, 
             this.altura, 
-            this.temperatura, 
+            this.temperaturaBase, 
             this.umidade,
             this.pressaoAr,
             this.pressaoX,
@@ -70,12 +74,13 @@ public class MacroChunk {
         this.altura = altura;
     }
 
-    public double getTemperatura() {
-        return temperatura;
+    public double getTemperaturaBase() {
+        return temperaturaBase;
     }
 
-    public void setTemperatura(double temperatura) {
-        this.temperatura = temperatura;
+    public void setTemperaturaBase(double temperaturaBase) {
+        this.temperaturaBase = temperaturaBase;
+        setTemperaturaLocal(temperaturaBase);
     }
     public double getUmidade() {
         return umidade;
@@ -124,6 +129,14 @@ public class MacroChunk {
     }
     public void setPressaoY(double pressaoY) {
         this.pressaoY = pressaoY;
+    }
+
+    public double getTemperaturaLocal() {
+        return temperaturaLocal;
+    }
+
+    public void setTemperaturaLocal(double temperaturaLocal) {
+        this.temperaturaLocal = temperaturaLocal;
     }
 
 }

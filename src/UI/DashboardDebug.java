@@ -131,6 +131,7 @@ public class DashboardDebug {
             this.monitor.setImage(this.mapas[this.indiceAtual]);
             this.monitor.repaint();
         });
+        
 
         janela.add(this.painelInfo, BorderLayout.WEST);
         janela.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

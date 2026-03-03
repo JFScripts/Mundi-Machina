@@ -16,11 +16,11 @@ public class HumidityMap implements gerarImagem{
         MacroChunk[][] matrizMundo = mundo.getMatrizMundo();
         BufferedImage humidityMap = new BufferedImage(widht, height, BufferedImage.TYPE_INT_RGB);
         
-        for(int i = 0; i < widht; i ++){
-            for(int j = 0; j < height; j ++){
-                double umidadeAtual = matrizMundo[j][i].getUmidade();
+        for(int x = 0; x < widht; x ++){
+            for(int y = 0; y < height; y ++){
+                double umidadeAtual = matrizMundo[x][y].getUmidade();
                 Color corAtual = getMapColor(umidadeAtual);
-                humidityMap.setRGB(i, j, corAtual.getRGB());
+                humidityMap.setRGB(x, y, corAtual.getRGB());
             }
         }
 

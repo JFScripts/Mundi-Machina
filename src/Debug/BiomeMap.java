@@ -18,11 +18,11 @@ public class BiomeMap implements gerarImagem{
         BufferedImage biomeMap = new BufferedImage(widht, height, BufferedImage.TYPE_INT_RGB);
 
         
-        for(int i = 0; i < widht; i ++){
-            for(int j = 0; j < height; j ++){
-                Biomas biomaAtual = matrizMundo[j][i].getBioma();
+        for(int x = 0; x < widht; x ++){
+            for(int y = 0; y < height; y ++){
+                Biomas biomaAtual = matrizMundo[x][y].getBioma();
                 Color corAtual = biomaAtual.getBiomaCor();
-                biomeMap.setRGB(i, j, corAtual.getRGB());
+                biomeMap.setRGB(x, y, corAtual.getRGB());
             }
         }
 

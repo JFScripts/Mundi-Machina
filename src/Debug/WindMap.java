@@ -17,10 +17,10 @@ public class WindMap implements gerarImagem{
         BufferedImage windMap = new BufferedImage(widht, height, BufferedImage.TYPE_INT_RGB);
 
         
-        for(int i = 0; i < widht; i ++){
-            for(int j = 0; j < height; j ++){
-                Color corAtual = getMapColor(matrizMundo[j][i].getPressaoX(), matrizMundo[j][i].getPressaoY());
-                windMap.setRGB(i, j, corAtual.getRGB());
+        for(int x = 0; x < widht; x ++){
+            for(int y = 0; y < height; y ++){
+                Color corAtual = getMapColor(matrizMundo[x][y].getPressaoX(), matrizMundo[x][y].getPressaoY());
+                windMap.setRGB(x, y, corAtual.getRGB());
             }
         }
 

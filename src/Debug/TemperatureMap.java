@@ -16,11 +16,11 @@ public class TemperatureMap implements gerarImagem{
         MacroChunk[][] matrizMundo = mundo.getMatrizMundo();
         BufferedImage temperatureMap = new BufferedImage(widht, height, BufferedImage.TYPE_INT_RGB);
 
-        for(int i = 0; i < widht; i ++){
-            for(int j = 0; j < height; j ++){
-                double temperaturaAtual = matrizMundo[j][i].getTemperatura();
+        for(int x = 0; x < widht; x ++){
+            for(int y = 0; y < height; y ++){
+                double temperaturaAtual = matrizMundo[x][y].getTemperaturaLocal();
                 Color corAtual = getMapColor(temperaturaAtual);
-                temperatureMap.setRGB(i, j, corAtual.getRGB());
+                temperatureMap.setRGB(x, y, corAtual.getRGB());
             }
         }
 

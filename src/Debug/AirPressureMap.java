@@ -17,11 +17,11 @@ public class AirPressureMap implements gerarImagem{
         BufferedImage airPressureMap = new BufferedImage(widht, height, BufferedImage.TYPE_INT_RGB);
 
         
-        for(int i = 0; i < widht; i ++){
-            for(int j = 0; j < height; j ++){
-                double pressaoAtual = matrizMundo[j][i].getPressaoAr();
+        for(int x = 0; x < widht; x ++){
+            for(int y = 0; y < height; y ++){
+                double pressaoAtual = matrizMundo[x][y].getPressaoAr();
                 Color corAtual = getMapColor(pressaoAtual);
-                airPressureMap.setRGB(i, j, corAtual.getRGB());
+                airPressureMap.setRGB(x, y, corAtual.getRGB());
             }
         }
 
