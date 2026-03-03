@@ -250,7 +250,9 @@ public class Mundo {
             }
             if(temperaturaLocal >= bioma.getTempMin() && temperaturaLocal <= bioma.getTempMax()){
                 if(umidadeLocal >= bioma.getUmidMin() && umidadeLocal <= bioma.getUmidMax()){
-                    candidatos.add(bioma);
+                    if(alturaLocal >= bioma.getAltMin() && alturaLocal <= bioma.getAltMax()){
+                        candidatos.add(bioma);
+                    }
                 }
             }
         }
@@ -342,6 +344,14 @@ public class Mundo {
     
     public void setCicloMundial(long cicloMundial) {
         this.cicloMundial = cicloMundial;
+    }
+
+    public int getLinhaEquador() {
+        return linhaEquador;
+    }
+
+    public Random getGeraracaoAleatoria() {
+        return geraracaoAleatoria;
     }
     
 }

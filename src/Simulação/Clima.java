@@ -15,13 +15,14 @@ public class Clima {
         double[][] proximaUmidade = new double[mundo.getWidht()][mundo.getHeight()];
         MacroChunk[][] macroChunkAtual = mundo.getMatrizMundo();
 
+        atualizarTemperaturaGlobal(mundo, 1440);
+
         for(int y = 0; y < mundo.getWidht(); y ++){
             for(int x = 0; x < mundo.getHeight(); x ++){
                 atualizarPressaoGlobal(mundo, x, y);
             }
         }
         atualizarVento(mundo);
-        atualizarTemperaturaGlobal(mundo, 1440);
 
         for(int y = 0; y < mundo.getWidht(); y ++){
             for(int x = 0; x < mundo.getHeight(); x ++){
@@ -87,16 +88,24 @@ public class Clima {
     private static void atualizarTemperaturaGlobal(Mundo mundo, double duracaoDia){
         double fracaoDia = (mundo.getCicloMundial() % duracaoDia) / duracaoDia;
         double tempoOnda = fracaoDia * (2 * Math.PI);
-        
+        double duracaoAno = 1440 * 28 * 12;
+        double fracaoAno = (mundo.getCicloMundial() % duracaoAno) / duracaoAno;
+        double ondaSazonal = Math.sin(fracaoAno * 2 * Math.PI);
+
+        int equador = mundo.getLinhaEquador();
+        int maiorDistancia = Math.max(equador, mundo.getHeight() - equador);
+
         int width = mundo.getWidht();
         int height = mundo.getHeight();
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                double macroChunkPosicao = (x / width) * (2*Math.PI);
+                double fatorHemisferico =  (equador - y)/(double) maiorDistancia;
+                double macroChunkPosicao =  (((double) x / width) * (2*Math.PI));
                 double incidenciaSolar = Math.sin(tempoOnda + macroChunkPosicao);
-                double fatorSolar = 0.05;
-                double novaTemperatura = mundo.getXYMacroChunk(x, y).getTemperaturaBase() + (incidenciaSolar * fatorSolar);
+                double fatorSolar = 0.2;
+                double impactoSazonal = ondaSazonal * fatorHemisferico * 0.3;
+                double novaTemperatura = mundo.getXYMacroChunk(x, y).getTemperaturaBase() + (incidenciaSolar * fatorSolar) + impactoSazonal;
                 mundo.getXYMacroChunk(x, y).setTemperaturaLocal(novaTemperatura);
             }
         }

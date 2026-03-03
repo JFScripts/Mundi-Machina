@@ -2,12 +2,12 @@ package UI;
 
 import java.awt.BorderLayout;
 import java.awt.image.BufferedImage;
-import java.util.Scanner;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 import Ferramentas.GerenciadorDeCiclos;
 import Ferramentas.GerenciadorDeMapas;
@@ -23,6 +23,8 @@ public class DashboardDebug {
     private JTextArea painelInfo;
     private GerenciadorDeMapas gerenciadorDeMapas;
     private JPanel painelBotoes;
+    
+    private volatile boolean isSimulandoInfinitamente = false;
     
     public DashboardDebug(BufferedImage[] mapas, Mundo mundo, GerenciadorDeMapas gerenciadorDeMapas) {
         this.mapas = mapas;
@@ -63,7 +65,7 @@ public class DashboardDebug {
                 int indiceY = (int) ((pixelY - margemY) / escala);
                 
                 if(indiceX >= 0 && indiceX < 100 && indiceY >= 0 && indiceY < 100){
-                    var chunckClicado = DashboardDebug.this.mundo.getMatrizMundo()[indiceY][indiceX];
+                    var chunckClicado = DashboardDebug.this.mundo.getMatrizMundo()[indiceX][indiceY];
                     
                     String textoRelatorio = chunckClicado.gerarRelatorio();
                     painelInfo.setText(textoRelatorio);
@@ -84,19 +86,19 @@ public class DashboardDebug {
         
         adicionarBotao("Novo Mundo com Seed", e -> {
             String input = JOptionPane.showInputDialog("Digite uma Seed");
-            Long seed = Long.parseLong(input);
-            this.mundo = new Mundo(100, 100, seed);
-            this.mundo.criarMundo(0.6, 5, 2, 5);
-            
-
-            this.mapas = this.gerenciadorDeMapas.GerarMapas(this.mundo);
-            
-            this.monitor.setImage(this.mapas[this.indiceAtual]);
-            this.painelInfo.setText(atualizarDadoMundo());
+            if (input != null && !input.isEmpty()) {
+                Long seed = Long.parseLong(input);
+                this.mundo = new Mundo(100, 100, seed);
+                this.mundo.criarMundo(0.6, 5, 2, 5);
+                
+                this.mapas = this.gerenciadorDeMapas.GerarMapas(this.mundo);
+                
+                this.monitor.setImage(this.mapas[this.indiceAtual]);
+                this.painelInfo.setText(atualizarDadoMundo());
+            }
         });
         
         adicionarBotao("Novo Mundo", e -> {
-            
             this.mundo = new Mundo(100, 100);
             this.mundo.criarMundo(0.6, 5, 2, 5);
             
@@ -132,11 +134,53 @@ public class DashboardDebug {
             this.monitor.repaint();
         });
         
+        adicionarBotao("Simular Infinito", e -> {
+            javax.swing.JButton botaoClicado = (javax.swing.JButton) e.getSource();
+            
+            if (isSimulandoInfinitamente) {
+                isSimulandoInfinitamente = false;
+                botaoClicado.setText("Simular Infinito");
+            } else {
+                isSimulandoInfinitamente = true;
+                botaoClicado.setText("Parar Simulação");
+                
+                new Thread(() -> {
+                    while (isSimulandoInfinitamente) {
+                        GerenciadorDeCiclos.atualizarUmCiclo(this.mundo);
+                        long ciclo = this.mundo.getCicloMundial();
+                        
+                        if (ciclo % 100 == 0) {
+                            SwingUtilities.invokeLater(() -> {
+                                this.painelInfo.setText(atualizarDadoMundo());
+                                this.mapas = this.gerenciadorDeMapas.GerarMapas(this.mundo);
+                                this.monitor.setImage(this.mapas[this.indiceAtual]);
+                                this.monitor.repaint();
+                            });
+                        }
+                        
+                        if (ciclo % (1440 * 28) == 0) {
+                            BufferedImage[] mapasDoDia = this.gerenciadorDeMapas.GerarMapas(this.mundo);
+                            long seedMundo = this.mundo.getSeedMundo();
+                            
+                            String caminhoPasta = "Simulacao/Mundo_" + seedMundo;
+                            java.io.File pasta = new java.io.File(caminhoPasta);
+                            if (!pasta.exists()) {
+                                pasta.mkdirs(); 
+                            }
+                            
+                            for(int i = 0; i < mapasDoDia.length; i++){
+                                String nomeMapa = this.gerenciadorDeMapas.getGeradores().get(i).getNomeString();
+                                String caminhoFinal = String.format("%s/Mapa_%s_Mes_%04d", caminhoPasta, nomeMapa, (ciclo / (1440 * 28)));
+                                exportarMapa(mapasDoDia[i], caminhoFinal);
+                            }
+                        }
+                    }
+                }).start();
+            }
+        });
 
         janela.add(this.painelInfo, BorderLayout.WEST);
         janela.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-
     }
 
     private void adicionarBotao(String texto, java.awt.event.ActionListener acao) {
