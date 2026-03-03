@@ -127,6 +127,9 @@ public class DashboardDebug {
         adicionarBotao("Avançar Ciclo", e -> {
             GerenciadorDeCiclos.atualizarUmCiclo(this.mundo);
             this.painelInfo.setText(atualizarDadoMundo());
+            this.mapas = this.gerenciadorDeMapas.GerarMapas(this.mundo);
+            this.monitor.setImage(this.mapas[this.indiceAtual]);
+            this.monitor.repaint();
         });
 
         janela.add(this.painelInfo, BorderLayout.WEST);

@@ -339,6 +339,10 @@ public class Mundo {
         return matrizMundo;
     }
 
+    public MacroChunk getXYMacroChunk(int x, int y){
+        return matrizMundo[x][y];
+    }
+
     public long getSeedMundo() {
         return seedMundo;
     }
