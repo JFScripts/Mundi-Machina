@@ -17,7 +17,7 @@ public class MacroChunk {
     private double pressaoX;
     private double pressaoY;
     
-    public MacroChunk(double altura, long sementeMundo, int xMundo, int yMundo) {
+    public MacroChunk(double altura, long sementeMundo, int yMundo, int xMundo) {
         this.altura = altura;
         this.temperatura = 0;
         this.umidade = 0;

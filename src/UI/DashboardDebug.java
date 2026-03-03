@@ -9,6 +9,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
+import Ferramentas.GerenciadorDeCiclos;
 import Ferramentas.GerenciadorDeMapas;
 import Ferramentas.PainelMapa;
 import Mundo.Mundo;
@@ -34,7 +35,7 @@ public class DashboardDebug {
         this.painelInfo.setLineWrap(true);
         this.painelInfo.setPreferredSize(new java.awt.Dimension(400, 0));
         this.painelInfo.setBorder(javax.swing.BorderFactory.createEmptyBorder(20, 20, 20, 40));
-        this.painelInfo.setText("Semente do Mundo: " + this.mundo.getSeedMundo());
+        this.painelInfo.setText(atualizarDadoMundo());
 
         JFrame janela = new JFrame("Tela de Debug");
         janela.setLayout(new BorderLayout());
@@ -50,29 +51,25 @@ public class DashboardDebug {
         this.monitor.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e){
-                // 1. Pega a coordenada bruta do clique na tela
+
                 int pixelX = e.getX();
                 int pixelY = e.getY();
 
-                // 2. Busca o estado atual do zoom e da movimentação da câmera
                 double escala = monitor.getEscalaAtual();
                 int margemX = monitor.getOffsetX();
                 int margemY = monitor.getOffsetY();
 
-                // 3. Traduz o pixel da tela para o índice exato da matriz 100x100
                 int indiceX = (int) ((pixelX - margemX) / escala);
                 int indiceY = (int) ((pixelY - margemY) / escala);
                 
-                // 4. Valida se o clique ocorreu dentro dos limites do mundo
                 if(indiceX >= 0 && indiceX < 100 && indiceY >= 0 && indiceY < 100){
-                    var chunckClicado = mundo.getMatrizMundo()[indiceY][indiceX];
+                    var chunckClicado = DashboardDebug.this.mundo.getMatrizMundo()[indiceY][indiceX];
                     
-                    // A nova arquitetura em ação: o Chunk gera o próprio relatório
                     String textoRelatorio = chunckClicado.gerarRelatorio();
                     painelInfo.setText(textoRelatorio);
                     
                 } else {
-                    painelInfo.setText("Semente do Mundo: " + mundo.getSeedMundo());
+                    painelInfo.setText(atualizarDadoMundo());
                 }
             }
         });
@@ -95,7 +92,7 @@ public class DashboardDebug {
             this.mapas = this.gerenciadorDeMapas.GerarMapas(this.mundo);
             
             this.monitor.setImage(this.mapas[this.indiceAtual]);
-            this.painelInfo.setText("Seed: " + this.mundo.getSeedMundo());
+            this.painelInfo.setText(atualizarDadoMundo());
         });
         
         adicionarBotao("Novo Mundo", e -> {
@@ -106,7 +103,7 @@ public class DashboardDebug {
             this.mapas = this.gerenciadorDeMapas.GerarMapas(this.mundo);
             
             this.monitor.setImage(this.mapas[this.indiceAtual]);
-            this.painelInfo.setText("Seed: " + this.mundo.getSeedMundo());
+            this.painelInfo.setText(atualizarDadoMundo());
         });
 
         adicionarBotao("Exportar Imagens", e -> {
@@ -125,6 +122,11 @@ public class DashboardDebug {
             }
             
             this.painelInfo.setText("Exportação concluída com sucesso!\nPasta: " + caminhoPasta);
+        });
+
+        adicionarBotao("Avançar Ciclo", e -> {
+            GerenciadorDeCiclos.atualizarUmCiclo(this.mundo);
+            this.painelInfo.setText(atualizarDadoMundo());
         });
 
         janela.add(this.painelInfo, BorderLayout.WEST);
@@ -148,5 +150,9 @@ public class DashboardDebug {
             e.printStackTrace();
             this.painelInfo.setText("Erro ao exportar imagem: " + e.getMessage());
         }
+    }
+
+    private String atualizarDadoMundo(){
+        return "Semente do Mundo: " + this.mundo.getSeedMundo() + "\nCiclo Atual: " + this.mundo.getCicloMundial();
     }
 }

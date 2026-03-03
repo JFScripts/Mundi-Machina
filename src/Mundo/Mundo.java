@@ -12,10 +12,13 @@ public class Mundo {
     private int linhaEquador;
     private MacroChunk[][] matrizMundo;
     private long seedMundo;
+    private long cicloMundial;
+
     private Random geraracaoAleatoria;
 
     public Mundo(int widht, int height, long seed) {
         this.seedMundo = seed;
+        this.cicloMundial = 0;
         this.geraracaoAleatoria = new Random(this.seedMundo);
         this.widht = widht;
         this.height = height;
@@ -340,5 +343,12 @@ public class Mundo {
         return seedMundo;
     }
 
+    public long getCicloMundial() {
+        return cicloMundial;
+    }
+    
+    public void setCicloMundial(long cicloMundial) {
+        this.cicloMundial = cicloMundial;
+    }
     
 }
