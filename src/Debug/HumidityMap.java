@@ -29,7 +29,7 @@ public class HumidityMap implements gerarImagem{
 
     public Color getMapColor(double dados) {
         double umidade = dados;
-        int blue = (int) (umidade * 255);
+        int blue = Math.max(0, Math.min(255, (int) (umidade * 255)));
         return new Color(0, 0, blue);
     }
 

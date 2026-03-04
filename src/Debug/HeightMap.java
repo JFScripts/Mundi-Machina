@@ -35,6 +35,9 @@ public class HeightMap implements gerarImagem{
 
         double alturaNormalizada = (altura - VALORMINIMO) / (VALORMAXIMO - VALORMINIMO);
         int corCinza = (int) Math.round(alturaNormalizada * 255);
+        if(corCinza <= 0){
+            corCinza = 0;
+        }
         return new Color(corCinza, corCinza, corCinza);
     }
 

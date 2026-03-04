@@ -4,19 +4,24 @@ import java.util.List;
 import java.util.Random;
 
 import Enums.Biomas;
+import Ferramentas.GeradorRuido2d;
 
 public class Mundo {
+
+    private GeradorRuido2d geradorAltitude;
+    private GeradorRuido2d geradorUmidade;
     private int widht;
     private int height;
     private int linhaEquador;
     private MacroChunk[][] matrizMundo;
     private long seedMundo;
     private long cicloMundial;
-
     private Random geraracaoAleatoria;
 
     public Mundo(int widht, int height, long seed) {
         this.seedMundo = seed;
+        this.geradorAltitude = new GeradorRuido2d(seed);
+        this.geradorUmidade = new GeradorRuido2d(seed * 73);
         this.cicloMundial = 0;
         this.geraracaoAleatoria = new Random(this.seedMundo);
         this.widht = widht;
@@ -31,25 +36,31 @@ public class Mundo {
     }
 
     public void criarMundo(double valorTerra, int qntSuavizacao, int qntErosao, int qntUmidade){
- 
-        for(int x = 0; x < this.matrizMundo.length; x ++){
+        for(int x = 0; x < this.matrizMundo.length; x++){
             for(int y = 0; y < this.matrizMundo[x].length; y ++){
-                double numero = this.geraracaoAleatoria.nextDouble();
-                int valorCelula = 0;
-                if(numero < valorTerra){
-                    valorCelula = 1;
-                }
-                matrizMundo[x][y] = new MacroChunk(valorCelula, this.seedMundo, x, y);
+                double escala = 0.05;
+                double alturaAtual = geradorAltitude.gerarRuidoFractal(x * escala, y * escala, 4, 0.5, 2);
+                alturaAtual = (alturaAtual / 0.6) * 9; 
+                alturaAtual = Math.max(-9, Math.min(9, alturaAtual));
+                this.matrizMundo[x][y] = new MacroChunk(alturaAtual, this.seedMundo, x, y);
             }
         }
-
-        for(int i = 0; i < qntSuavizacao; i++){
-            suavizarMundo();
-        }
-
-        gerarAlturas(qntErosao);
         adicionarTemperatura();
-        adicionarUmidade(qntUmidade);
+        
+        for(int x = 0; x < this.matrizMundo.length; x++){
+            for(int y = 0; y < this.matrizMundo[x].length; y ++){
+                if(matrizMundo[x][y].getAltura() > 0){
+                    double escala = 0.02;
+                    double umidadeAtual = geradorUmidade.gerarRuidoFractal(x * escala, y * escala, 2, 0.5, 2);
+                    umidadeAtual /= 0.6;
+                    umidadeAtual =(umidadeAtual + 1) / 2;
+                    umidadeAtual = Math.max(0, Math.min(1, umidadeAtual));
+                    this.matrizMundo[x][y].setUmidade(umidadeAtual);
+                } else {
+                    this.matrizMundo[x][y].setUmidade(1);
+                }
+            }
+        }
 
         for(int x = 0; x < this.matrizMundo.length; x ++){
             for(int y = 0; y < this.matrizMundo[x].length; y ++){
@@ -58,114 +69,6 @@ public class Mundo {
             }
         }
         calcularVentos();
-    }
-
-    private void suavizarMundo(){
-
-        double taxaMutacao = 0.05;
-        int[][] novoMundo = new int[this.widht][this.height];
-        for(int x = 0; x < this.matrizMundo.length; x ++){
-            for(int y = 0; y < this.matrizMundo[x].length; y ++){
-                
-                int contagemTerra = contarTerra(x, y);
-                int contagemMar = 8 - contagemTerra;
-                if(contagemTerra > contagemMar){
-                    novoMundo[x][y] = 1;
-                } else {
-                    novoMundo[x][y] = 0;
-                }
-                double chanceMutacao = this.geraracaoAleatoria.nextDouble();
-                if(chanceMutacao < taxaMutacao && contagemTerra >= 3 && contagemTerra <= 5){
-                    if(novoMundo[x][y] == 1){
-                        novoMundo[x][y] = 0;
-                    } else {
-                        novoMundo[x][y] = 1;
-                    }
-                }
-            }
-        }
-        for(int x = 0; x < this.matrizMundo.length; x ++){
-            for(int y = 0; y < this.matrizMundo[x].length; y ++){
-                matrizMundo[x][y].setAltura(novoMundo[x][y]);
-            }
-        }
-        
-    }
-
-    private int contarTerra(int i, int j){
-        int contagemTerra = 0;
-        for(int x = -1; x <= 1; x ++){
-            for(int y = -1; y <= 1; y ++){
-                int vizinhoColuna = x + i;
-                int vizinhoLinha = y + j;
-                if(x == 0 && y == 0){
-                    continue;
-                } else if(vizinhoColuna >= 0 && vizinhoColuna < this.widht && vizinhoLinha >= 0 && vizinhoLinha < this.height){
-                    if(this.matrizMundo[vizinhoColuna][vizinhoLinha].getAltura() == 1){
-                        contagemTerra ++;
-                    } 
-                } else {
-                    continue;
-                }
-            }
-        }
-        return contagemTerra;
-    }
-
-    private void gerarAlturas(int qntErosao) {
-
-        for(int x = 0; x < this.matrizMundo.length; x ++){
-            for(int y = 0; y < this.matrizMundo[x].length; y ++){
-                if (matrizMundo[x][y].getAltura() != 0) {
-                    double valorBase = this.geraracaoAleatoria.nextDouble();
-                    valorBase = Math.pow(valorBase, 3);
-                    double novaAltura = (valorBase * 8) + 1;
-                    matrizMundo[x][y].setAltura(novaAltura);
-                }
-            }
-        }
-    
-        for (int a = 0; a < qntErosao; a++) {
-            double[][] bufferAnoAtual = new double[this.widht][this.height];
-    
-            for(int x = 0; x < this.matrizMundo.length; x ++){
-                for(int y = 0; y < this.matrizMundo[x].length; y ++){
-                    if (matrizMundo[x][y].getAltura() == 0) {
-                        bufferAnoAtual[x][y] = 0; 
-                        
-                    } else {
-                        bufferAnoAtual[x][y] = suavizarAltura(x, y);
-                    }
-                }
-            }
-    
-            for(int x = 0; x < this.matrizMundo.length; x ++){
-                for(int y = 0; y < this.matrizMundo[x].length; y ++){
-                    this.matrizMundo[x][y].setAltura(bufferAnoAtual[x][y]);
-                }
-            }
-        }
-    }
-
-    private double suavizarAltura(int i, int j){
-        double somaTotal = 0;
-        int qntCelulas = 0;
-        for(int x = -1; x <= 1; x ++){
-            for(int y = -1; y <= 1; y ++){
-                int vizinhoColuna = x + i;
-                int vizinhoLinha = y + j;
-                if(vizinhoColuna >= 0 && vizinhoColuna < this.widht && vizinhoLinha >= 0 && vizinhoLinha < this.height){
-                    somaTotal += this.matrizMundo[vizinhoColuna][vizinhoLinha].getAltura();
-                    qntCelulas ++;
-                }
-                
-            }
-        }
-        double mediaVizinhos = somaTotal/qntCelulas;
-        double alturaAtual = matrizMundo[i][j].getAltura();
-        double resistencia = alturaAtual/10;
-        double alturaFinal = (alturaAtual * resistencia) + (mediaVizinhos * (1 - resistencia));
-        return alturaFinal;
     }
 
     private void adicionarTemperatura(){
@@ -182,58 +85,6 @@ public class Mundo {
                 this.matrizMundo[x][y].setTemperaturaBase(temperaturaFinal);
             }
         }
-    }
-
-    private void adicionarUmidade(int cicloUmidade){
-        double[][] novaUmidade = new double[this.widht][this.height];
-
-        for(int x = 0; x < this.matrizMundo.length; x ++){
-            for(int y = 0; y < this.matrizMundo[x].length; y ++){
-                if(matrizMundo[x][y].getAltura() == 0){
-                    matrizMundo[x][y].setUmidade(1);
-                } else {
-                    matrizMundo[x][y].setUmidade(0);
-                }
-            }
-        }
-
-        for(int i = 0; i < cicloUmidade; i ++){
-            for(int x = 0; x < this.matrizMundo.length; x ++){
-                for(int y = 0; y < this.matrizMundo[x].length; y ++){
-                    novaUmidade[x][y] = moverUmidade(x, y);
-                }
-            }
-            for(int x = 0; x < this.matrizMundo.length; x ++){
-                for(int y = 0; y < this.matrizMundo[x].length; y ++){
-                    this.matrizMundo[x][y].setUmidade(novaUmidade[x][y]);
-                }
-            }
-        }
-    }
-
-    private double moverUmidade(int i, int j){
-        if(this.matrizMundo[i][j].getAltura() == 0){
-            return 1;
-        } 
-        double maiorUmidadeVizinho = 0;
-        for(int x = -1; x <= 1; x ++){
-            for(int y = -1; y <= 1; y ++){
-                int vizinhoColuna = x + i;
-                int vizinhoLinha = y + j;
-                
-                if(x == 0 && y == 0){
-                    continue;
-                }
-                if (vizinhoColuna >= 0 && vizinhoColuna < this.widht && vizinhoLinha >= 0 && vizinhoLinha < this.height) {
-                    if (this.matrizMundo[vizinhoColuna][vizinhoLinha].getUmidade() > maiorUmidadeVizinho) {
-                        maiorUmidadeVizinho = this.matrizMundo[vizinhoColuna][vizinhoLinha].getUmidade();
-                    }
-                }
-           }
-        }
-        double umidadePenalidade = maiorUmidadeVizinho - ((0.05 * this.matrizMundo[i][j].getAltura()) + (0.1 * this.matrizMundo[i][j].getTemperaturaLocal()));
-        
-        return Math.max(0, umidadePenalidade);
     }
 
     private Biomas distribuirBiomas(int x, int y){
