@@ -12,6 +12,7 @@ public class MacroChunk {
     private double temperaturaBase;
     private double umidade;
     private Biomas bioma;
+    private double magia;
 
     private double pressaoAr;
     private double pressaoX;
@@ -23,6 +24,7 @@ public class MacroChunk {
         this.altura = altura;
         this.temperaturaBase = 0;
         this.umidade = 0;
+        this.magia = 0;
         this.temperaturaLocal = temperaturaBase;
         this.coordenadaMundialX = xMundo;
         this.coordenadaMundialY = yMundo;
@@ -52,7 +54,8 @@ public class MacroChunk {
             "Umidade: %.2f%n" +
             "Pressão do Ar: %.2f%n" +
             "Ar X: %.2f | Ar Y %.2f%n"+
-            "Bioma: %s", 
+            "Bioma: %s%n"+
+            "Magia: %.2f", 
             this.semente,
             this.coordenadaMundialX,
             this.coordenadaMundialY, 
@@ -62,7 +65,8 @@ public class MacroChunk {
             this.pressaoAr,
             this.pressaoX,
             this.pressaoY,
-            this.bioma
+            this.bioma,
+            this.magia
         );
     }
 
@@ -137,6 +141,14 @@ public class MacroChunk {
 
     public void setTemperaturaLocal(double temperaturaLocal) {
         this.temperaturaLocal = temperaturaLocal;
+    }
+
+    public double getMagia() {
+        return magia;
+    }
+
+    public void setMagia(double magia) {
+        this.magia = magia;
     }
 
 }

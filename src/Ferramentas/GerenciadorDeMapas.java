@@ -6,6 +6,7 @@ import Debug.AirPressureMap;
 import Debug.BiomeMap;
 import Debug.HeightMap;
 import Debug.HumidityMap;
+import Debug.MagicMap;
 import Debug.TemperatureMap;
 import Debug.WindMap;
 import Interface.gerarImagem;
@@ -24,6 +25,7 @@ public class GerenciadorDeMapas {
         this.geradores.add(new TemperatureMap());
         this.geradores.add(new AirPressureMap());
         this.geradores.add(new WindMap());
+        this.geradores.add(new MagicMap());
     }
 
     public BufferedImage[] GerarMapas(Mundo mundo){

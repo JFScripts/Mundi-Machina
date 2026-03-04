@@ -10,6 +10,8 @@ public class Mundo {
 
     private GeradorRuido2d geradorAltitude;
     private GeradorRuido2d geradorUmidade;
+    private GeradorRuido2d geradorMagia;
+
     private int widht;
     private int height;
     private int linhaEquador;
@@ -22,6 +24,7 @@ public class Mundo {
         this.seedMundo = seed;
         this.geradorAltitude = new GeradorRuido2d(seed);
         this.geradorUmidade = new GeradorRuido2d(seed * 73);
+        this.geradorMagia = new GeradorRuido2d(seed * 37);
         this.cicloMundial = 0;
         this.geraracaoAleatoria = new Random(this.seedMundo);
         this.widht = widht;
@@ -43,6 +46,14 @@ public class Mundo {
                 alturaAtual = (alturaAtual / 0.6) * 9; 
                 alturaAtual = Math.max(-9, Math.min(9, alturaAtual));
                 this.matrizMundo[x][y] = new MacroChunk(alturaAtual, this.seedMundo, x, y);
+
+                escala = 0.05;
+                double magiaAtual = geradorMagia.gerarRuidoFractal(x * escala, y * escala, 4, 0.5, 2);
+                magiaAtual = Math.abs(magiaAtual);
+                if(magiaAtual < 0.35){
+                    magiaAtual = 0;
+                }
+                this.matrizMundo[x][y].setMagia(magiaAtual);
             }
         }
         adicionarTemperatura();
@@ -88,35 +99,39 @@ public class Mundo {
     }
 
     private Biomas distribuirBiomas(int x, int y){
-        List<Biomas> candidatos = new ArrayList<>();
-        double temperaturaLocal = this.matrizMundo[x][y].getTemperaturaBase();
-        double umidadeLocal = this.matrizMundo[x][y].getUmidade();
-        double alturaLocal = this.matrizMundo[x][y].getAltura();
-        if(alturaLocal  <= 0){
+        MacroChunk local = matrizMundo[x][y];
+        double altLocal = local.getAltura();
+        double tempLocal = local.getTemperaturaLocal();
+        double umidLocal = local.getUmidade();
+        double magiaLocal = local.getMagia();
+        Biomas biomaAtual = Biomas.DESERTO;
+        double vetorAtual = 999;
+
+        if(altLocal <= 0){
             return Biomas.OCEANO;
         }
+
         for(Biomas bioma : Biomas.values()){
-            if(bioma == Biomas.OCEANO){
-                continue;
-            }
-            if(temperaturaLocal >= bioma.getTempMin() && temperaturaLocal <= bioma.getTempMax()){
-                if(umidadeLocal >= bioma.getUmidMin() && umidadeLocal <= bioma.getUmidMax()){
-                    if(alturaLocal >= bioma.getAltMin() && alturaLocal <= bioma.getAltMax()){
-                        candidatos.add(bioma);
-                    }
-                }
+            double altIdeal = bioma.getAltIdeal();
+            double tempIdeal = bioma.getTempIdeal();
+            double umidIdeal = bioma.getUmidIdeal();
+            double magiaIdeal = bioma.getMagiaIdeal();
+
+            double vetorAltura = ((altLocal - altIdeal)/9) * ((altLocal - altIdeal)/9);
+            double vetorTemperatura = (tempLocal - tempIdeal) * (tempLocal - tempIdeal);
+            double vetorUmidade = (umidLocal - umidIdeal) * (umidLocal - umidIdeal);
+            double vetorMagia = (magiaLocal - magiaIdeal) * (magiaLocal - magiaIdeal);
+
+            double vetorSomado = vetorAltura + vetorTemperatura + vetorUmidade + vetorMagia;
+
+            double vetorTemp = Math.sqrt(vetorSomado);
+            if(vetorTemp < vetorAtual){
+                vetorAtual = vetorTemp;
+                biomaAtual = bioma;
             }
         }
 
-        if(candidatos.isEmpty()){
-            return Biomas.PLANICIE;
-        }
-        if(candidatos.size() < 2){
-            return candidatos.get(0);
-        } else {
-            Random randomLocal = new Random(this.matrizMundo[x][y].getSemente());
-            return candidatos.get(randomLocal.nextInt(candidatos.size()));
-        }
+        return biomaAtual;
     }
 
     private void calcularPressao(int x, int y){

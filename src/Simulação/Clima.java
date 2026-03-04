@@ -164,32 +164,38 @@ public class Clima {
     }
 
     private static Biomas atualizarBioma(Mundo mundo, int x, int y){
-        List<Biomas> candidatos = new ArrayList<>();
-        double temperaturaLocal = mundo.getXYMacroChunk(x, y).getTemperaturaBase();
-        double umidadeLocal = mundo.getXYMacroChunk(x, y).getUmidade();
-        double alturaLocal = mundo.getXYMacroChunk(x, y).getAltura();
-        if(alturaLocal  <= 0){
-            return Biomas.OCEANO;
-        }
-        for(Biomas bioma : Biomas.values()){
-            if(bioma == Biomas.OCEANO){
-                continue;
+            MacroChunk local = mundo.getXYMacroChunk(x,y);
+            double altLocal = local.getAltura();
+            double tempLocal = local.getTemperaturaLocal();
+            double umidLocal = local.getUmidade();
+            double magiaLocal = local.getMagia();
+            Biomas biomaAtual = Biomas.DESERTO;
+            double vetorAtual = 999;
+    
+            if(altLocal <= 0){
+                return Biomas.OCEANO;
             }
-            if(temperaturaLocal >= bioma.getTempMin() && temperaturaLocal <= bioma.getTempMax()){
-                if(umidadeLocal >= bioma.getUmidMin() && umidadeLocal <= bioma.getUmidMax()){
-                    candidatos.add(bioma);
+    
+            for(Biomas bioma : Biomas.values()){
+                double altIdeal = bioma.getAltIdeal();
+                double tempIdeal = bioma.getTempIdeal();
+                double umidIdeal = bioma.getUmidIdeal();
+                double magiaIdeal = bioma.getMagiaIdeal();
+    
+                double vetorAltura = ((altLocal - altIdeal)/9) * ((altLocal - altIdeal)/9);
+                double vetorTemperatura = (tempLocal - tempIdeal) * (tempLocal - tempIdeal);
+                double vetorUmidade = (umidLocal - umidIdeal) * (umidLocal - umidIdeal);
+                double vetorMagia = (magiaLocal - magiaIdeal) * (magiaLocal - magiaIdeal);
+    
+                double vetorSomado = vetorAltura + vetorTemperatura + vetorUmidade + vetorMagia;
+    
+                double vetorTemp = Math.sqrt(vetorSomado);
+                if(vetorTemp < vetorAtual){
+                    vetorAtual = vetorTemp;
+                    biomaAtual = bioma;
                 }
             }
+    
+            return biomaAtual;
         }
-
-        if(candidatos.isEmpty()){
-            return Biomas.PLANICIE;
-        }
-        if(candidatos.size() < 2){
-            return candidatos.get(0);
-        } else {
-            Random randomLocal = new Random(mundo.getXYMacroChunk(x, y).getSemente());
-            return candidatos.get(randomLocal.nextInt(candidatos.size()));
-        }
-    }
 }

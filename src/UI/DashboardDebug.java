@@ -76,14 +76,22 @@ public class DashboardDebug {
             }
         });
 
-        adicionarBotao("Próximo >", e -> {
+        adicionarBotao("< Mapa", e -> {
+            this.indiceAtual--;
+            if (this.indiceAtual < 0) {
+                this.indiceAtual = this.mapas.length - 1; 
+            }
+            this.monitor.setImage(this.mapas[this.indiceAtual]);
+        });
+
+        adicionarBotao("Mapa >", e -> {
             this.indiceAtual++;
             if (this.indiceAtual > this.mapas.length - 1) {
                 this.indiceAtual = 0; 
             }
             this.monitor.setImage(this.mapas[this.indiceAtual]);
         });
-        
+                
         adicionarBotao("Novo Mundo com Seed", e -> {
             String input = JOptionPane.showInputDialog("Digite uma Seed");
             if (input != null && !input.isEmpty()) {
