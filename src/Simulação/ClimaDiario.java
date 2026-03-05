@@ -27,9 +27,18 @@ public class ClimaDiario {
 
         for(int y = 0; y < mundo.getWidht(); y ++){
             for(int x = 0; x < mundo.getHeight(); x ++){
+                escoarAgua(x, y, mundo, proximaUmidade);
+            }
+        }
+
+        for(int y = 0; y < mundo.getWidht(); y ++){
+            for(int x = 0; x < mundo.getHeight(); x ++){
                 double novaUmidade = macroChunkAtual[x][y].getUmidade();
-                novaUmidade += proximaUmidade[x][y];
-                macroChunkAtual[x][y].setUmidade(Math.min(novaUmidade, 1));
+                double taxaEvaporacao = 0.0005;
+                double aguaEvaporada = Math.max(0, macroChunkAtual[x][y].getTemperaturaLocal()) * taxaEvaporacao;
+                novaUmidade += proximaUmidade[x][y] - aguaEvaporada;
+                novaUmidade = Math.max(0, novaUmidade);
+                macroChunkAtual[x][y].setUmidade(novaUmidade);
                 if(macroChunkAtual[x][y].getAltura() <= 0){
                     macroChunkAtual[x][y].setUmidade(1);
                 }
@@ -39,7 +48,7 @@ public class ClimaDiario {
 
     private static void atualizarUmidade(int x, int y, MacroChunk curMacroChunk, double[][] proximaUmidade, Mundo mundo){
         double umidadeAtual = curMacroChunk.getUmidade();
-        double taxaTrasferencia = 0.1;
+        double taxaTrasferencia = 0.3;
         double pressaoX = curMacroChunk.getPressaoX();
         double pressaoY = curMacroChunk.getPressaoY();
         double umidadeX = Math.abs(umidadeAtual * pressaoX * taxaTrasferencia);
@@ -72,6 +81,65 @@ public class ClimaDiario {
         proximaUmidade[x][y] -= umidadeX;
         proximaUmidade[x][y] -= umidadeY;
 
+    }
+
+    private static void escoarAgua(int x, int y, Mundo mundo, double[][] proximaUmidade){
+        MacroChunk curMChunk = mundo.getXYMacroChunk(x, y);
+        int mundoSizeX = mundo.getWidht();
+        int mundoSizeY = mundo.getHeight();
+        double alturaAtual = curMChunk.getAltura();
+        double umidadeAtual = curMChunk.getUmidade();
+        if(alturaAtual <= 0){
+            return;
+        }
+        double saturacaoMaxima = 1;
+        if(umidadeAtual <= saturacaoMaxima){
+            return;
+        }
+        int vizinhoMaisBaixoX = x;
+        int vizinhoMaisBaixoY = y;
+        double menorAlturaEncontrada = alturaAtual;
+
+        if (y - 1 >= 0) { 
+            if(mundo.getXYMacroChunk(x, y-1).getAltura() < menorAlturaEncontrada){
+                vizinhoMaisBaixoX = x;
+                vizinhoMaisBaixoY = y - 1;
+                menorAlturaEncontrada = mundo.getXYMacroChunk(x, y-1).getAltura();
+            }
+        }
+
+        if (y + 1 < mundoSizeY) {
+            if(mundo.getXYMacroChunk(x, y+1).getAltura() < menorAlturaEncontrada){
+                vizinhoMaisBaixoX = x;
+                vizinhoMaisBaixoY = y + 1;
+                menorAlturaEncontrada = mundo.getXYMacroChunk(x, y+1).getAltura();
+            }
+        }
+
+        if (x - 1 >= 0) {
+            if(mundo.getXYMacroChunk(x - 1, y).getAltura() < menorAlturaEncontrada){
+                vizinhoMaisBaixoX = x - 1;
+                vizinhoMaisBaixoY = y;
+                menorAlturaEncontrada = mundo.getXYMacroChunk(x - 1, y).getAltura();
+            }
+        } 
+
+        if (x + 1 < mundoSizeX) {
+            if(mundo.getXYMacroChunk(x + 1, y).getAltura() < menorAlturaEncontrada){
+                vizinhoMaisBaixoX = x + 1;
+                vizinhoMaisBaixoY = y;
+                menorAlturaEncontrada = mundo.getXYMacroChunk(x + 1, y).getAltura();
+            }
+        } 
+
+        if(menorAlturaEncontrada == alturaAtual){
+            return;
+        }
+        double taxaTrasferencia = 1;
+        double umidadeTransferir = (umidadeAtual - saturacaoMaxima) * taxaTrasferencia;
+        proximaUmidade[x][y] -= umidadeAtual - umidadeTransferir;
+        proximaUmidade[vizinhoMaisBaixoX][vizinhoMaisBaixoY] += umidadeTransferir;
+        
     }
 
     private static void atualizarTemperaturaGlobal(Mundo mundo, double duracaoDia){
