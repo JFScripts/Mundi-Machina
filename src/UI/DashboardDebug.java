@@ -166,7 +166,7 @@ public class DashboardDebug {
                             });
                         }
                         
-                        if (ciclo % (1440 * 28) == 0) {
+                        /*if (ciclo % (1440) == 0) {
                             BufferedImage[] mapasDoDia = this.gerenciadorDeMapas.GerarMapas(this.mundo);
                             long seedMundo = this.mundo.getSeedMundo();
                             
@@ -181,7 +181,7 @@ public class DashboardDebug {
                                 String caminhoFinal = String.format("%s/Mapa_%s_Mes_%04d", caminhoPasta, nomeMapa, (ciclo / (1440 * 28)));
                                 exportarMapa(mapasDoDia[i], caminhoFinal);
                             }
-                        }
+                        }*/
                     }
                 }).start();
             }

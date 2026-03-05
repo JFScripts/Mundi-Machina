@@ -1,14 +1,9 @@
 package Simulação;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
-import Enums.Biomas;
 import Mundo.MacroChunk;
 import Mundo.Mundo;
 
-public class Clima {
+public class ClimaDiario {
     
     
     public static void simularClima(Mundo mundo){
@@ -40,12 +35,6 @@ public class Clima {
                 }
             }
         }
-        for(int y = 0; y < mundo.getWidht(); y ++){
-            for(int x = 0; x < mundo.getHeight(); x ++){
-                macroChunkAtual[x][y].setBioma(atualizarBioma(mundo, x, y));
-            }
-        }
-        
     }
 
     private static void atualizarUmidade(int x, int y, MacroChunk curMacroChunk, double[][] proximaUmidade, Mundo mundo){
@@ -100,12 +89,19 @@ public class Clima {
 
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
+                MacroChunk curMChunk = mundo.getXYMacroChunk(x, y);
                 double fatorHemisferico =  (equador - y)/(double) maiorDistancia;
                 double macroChunkPosicao =  (((double) x / width) * (2*Math.PI));
                 double incidenciaSolar = Math.sin(tempoOnda + macroChunkPosicao);
                 double fatorSolar = 0.2;
                 double impactoSazonal = ondaSazonal * fatorHemisferico * 0.3;
-                double novaTemperatura = mundo.getXYMacroChunk(x, y).getTemperaturaBase() + (incidenciaSolar * fatorSolar) + impactoSazonal;
+                double temperaturaDiaria = curMChunk.getTemperaturaBase() + (incidenciaSolar * fatorSolar) + impactoSazonal;
+                double temperaturaAtual = curMChunk.getTemperaturaLocal();
+                double inerciaTermica = 0.005;
+                if(curMChunk.getAltura() <= 0){
+                    inerciaTermica = 0.0001;
+                }
+                double novaTemperatura = temperaturaAtual + (temperaturaDiaria - temperaturaAtual) * inerciaTermica;
                 mundo.getXYMacroChunk(x, y).setTemperaturaLocal(novaTemperatura);
             }
         }
@@ -162,40 +158,4 @@ public class Clima {
             }
         }
     }
-
-    private static Biomas atualizarBioma(Mundo mundo, int x, int y){
-            MacroChunk local = mundo.getXYMacroChunk(x,y);
-            double altLocal = local.getAltura();
-            double tempLocal = local.getTemperaturaLocal();
-            double umidLocal = local.getUmidade();
-            double magiaLocal = local.getMagia();
-            Biomas biomaAtual = Biomas.DESERTO;
-            double vetorAtual = 999;
-    
-            if(altLocal <= 0){
-                return Biomas.OCEANO;
-            }
-    
-            for(Biomas bioma : Biomas.values()){
-                double altIdeal = bioma.getAltIdeal();
-                double tempIdeal = bioma.getTempIdeal();
-                double umidIdeal = bioma.getUmidIdeal();
-                double magiaIdeal = bioma.getMagiaIdeal();
-    
-                double vetorAltura = ((altLocal - altIdeal)/9) * ((altLocal - altIdeal)/9);
-                double vetorTemperatura = (tempLocal - tempIdeal) * (tempLocal - tempIdeal);
-                double vetorUmidade = (umidLocal - umidIdeal) * (umidLocal - umidIdeal);
-                double vetorMagia = (magiaLocal - magiaIdeal) * (magiaLocal - magiaIdeal);
-    
-                double vetorSomado = vetorAltura + vetorTemperatura + vetorUmidade + vetorMagia;
-    
-                double vetorTemp = Math.sqrt(vetorSomado);
-                if(vetorTemp < vetorAtual){
-                    vetorAtual = vetorTemp;
-                    biomaAtual = bioma;
-                }
-            }
-    
-            return biomaAtual;
-        }
 }
