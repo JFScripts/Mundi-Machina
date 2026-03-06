@@ -9,6 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
+import Enums.Tempo;
 import Ferramentas.GerenciadorDeCiclos;
 import Ferramentas.GerenciadorDeMapas;
 import Ferramentas.PainelMapa;
@@ -135,7 +136,7 @@ public class DashboardDebug {
         });
 
         adicionarBotao("Avançar Ciclo", e -> {
-            GerenciadorDeCiclos.atualizarUmCiclo(this.mundo);
+            GerenciadorDeCiclos.simularTickMundo(this.mundo);
             this.painelInfo.setText(atualizarDadoMundo());
             this.mapas = this.gerenciadorDeMapas.GerarMapas(this.mundo);
             this.monitor.setImage(this.mapas[this.indiceAtual]);
@@ -154,10 +155,10 @@ public class DashboardDebug {
                 
                 new Thread(() -> {
                     while (isSimulandoInfinitamente) {
-                        GerenciadorDeCiclos.atualizarUmCiclo(this.mundo);
+                        GerenciadorDeCiclos.simularTickMundo(this.mundo);
                         long ciclo = this.mundo.getCicloMundial();
                         
-                        if (ciclo % 100 == 0) {
+                        if (ciclo % 30 == 0) {
                             SwingUtilities.invokeLater(() -> {
                                 this.painelInfo.setText(atualizarDadoMundo());
                                 this.mapas = this.gerenciadorDeMapas.GerarMapas(this.mundo);
@@ -209,6 +210,10 @@ public class DashboardDebug {
     }
 
     private String atualizarDadoMundo(){
-        return "Semente do Mundo: " + this.mundo.getSeedMundo() + "\nCiclo Atual: " + this.mundo.getCicloMundial();
+        return "Semente do Mundo: " + this.mundo.getSeedMundo() + 
+        "\nCiclo Atual: " + this.mundo.getCicloMundial() + 
+        "\nAno Atual: " + this.mundo.getCicloMundial() / Tempo.ANO.getQntCiclos() + 
+        "\nMês Atual: " + this.mundo.getCicloMundial() / Tempo.MES.getQntCiclos() + 
+        "\nDia Atual: " + this.mundo.getCicloMundial() / Tempo.DIA.getQntCiclos();
     }
 }

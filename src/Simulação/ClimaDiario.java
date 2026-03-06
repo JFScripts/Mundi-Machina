@@ -1,11 +1,12 @@
 package Simulação;
 
+import Enums.Tempo;
 import Mundo.MacroChunk;
 import Mundo.Mundo;
 
 public class ClimaDiario {
     
-    
+    private static int fatorTempo = Tempo.HORA.getQntCiclos();
     public static void simularClima(Mundo mundo){
         double[][] proximaUmidade = new double[mundo.getWidht()][mundo.getHeight()];
         MacroChunk[][] macroChunkAtual = mundo.getMatrizMundo();
@@ -34,7 +35,7 @@ public class ClimaDiario {
         for(int y = 0; y < mundo.getWidht(); y ++){
             for(int x = 0; x < mundo.getHeight(); x ++){
                 double novaUmidade = macroChunkAtual[x][y].getUmidade();
-                double taxaEvaporacao = 0.0005;
+                double taxaEvaporacao = 0.0008;
                 double aguaEvaporada = Math.max(0, macroChunkAtual[x][y].getTemperaturaLocal()) * taxaEvaporacao;
                 novaUmidade += proximaUmidade[x][y] - aguaEvaporada;
                 novaUmidade = Math.max(0, novaUmidade);
@@ -48,7 +49,7 @@ public class ClimaDiario {
 
     private static void atualizarUmidade(int x, int y, MacroChunk curMacroChunk, double[][] proximaUmidade, Mundo mundo){
         double umidadeAtual = curMacroChunk.getUmidade();
-        double taxaTrasferencia = 0.3;
+        double taxaTrasferencia = 0.45;
         double pressaoX = curMacroChunk.getPressaoX();
         double pressaoY = curMacroChunk.getPressaoY();
         double umidadeX = Math.abs(umidadeAtual * pressaoX * taxaTrasferencia);
@@ -137,7 +138,7 @@ public class ClimaDiario {
         }
         double taxaTrasferencia = 1;
         double umidadeTransferir = (umidadeAtual - saturacaoMaxima) * taxaTrasferencia;
-        proximaUmidade[x][y] -= umidadeAtual - umidadeTransferir;
+        proximaUmidade[x][y] -= umidadeTransferir;
         proximaUmidade[vizinhoMaisBaixoX][vizinhoMaisBaixoY] += umidadeTransferir;
         
     }
@@ -145,7 +146,7 @@ public class ClimaDiario {
     private static void atualizarTemperaturaGlobal(Mundo mundo, double duracaoDia){
         double fracaoDia = (mundo.getCicloMundial() % duracaoDia) / duracaoDia;
         double tempoOnda = fracaoDia * (2 * Math.PI);
-        double duracaoAno = 1440 * 28 * 12;
+        double duracaoAno = Tempo.ANO.getQntCiclos();
         double fracaoAno = (mundo.getCicloMundial() % duracaoAno) / duracaoAno;
         double ondaSazonal = Math.sin(fracaoAno * 2 * Math.PI);
 
@@ -165,7 +166,7 @@ public class ClimaDiario {
                 double impactoSazonal = ondaSazonal * fatorHemisferico * 0.3;
                 double temperaturaDiaria = curMChunk.getTemperaturaBase() + (incidenciaSolar * fatorSolar) + impactoSazonal;
                 double temperaturaAtual = curMChunk.getTemperaturaLocal();
-                double inerciaTermica = 0.005;
+                double inerciaTermica = 0.0005;
                 if(curMChunk.getAltura() <= 0){
                     inerciaTermica = 0.0001;
                 }

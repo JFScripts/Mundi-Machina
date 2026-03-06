@@ -1,6 +1,4 @@
 package Mundo;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import Enums.Biomas;
@@ -112,6 +110,9 @@ public class Mundo {
         }
 
         for(Biomas bioma : Biomas.values()){
+            if(!bioma.isPodeGerarNaturalmente()){
+                continue;
+            }
             double altIdeal = bioma.getAltIdeal();
             double tempIdeal = bioma.getTempIdeal();
             double umidIdeal = bioma.getUmidIdeal();

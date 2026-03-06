@@ -1,16 +1,24 @@
 package Mundo;
 
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Random;
+
 import Enums.Biomas;
+import Enums.Tempo;
 import Ferramentas.GerenciadorDeSemente;
 
 public class MacroChunk {
-   
+
     private long semente;
+    private Random geracaoAleatoria;
+
     private int coordenadaMundialX;
     private int coordenadaMundialY;
     private double altura;
     private double temperaturaBase;
     private double umidade;
+
     private Biomas bioma;
     private double magia;
 
@@ -21,29 +29,22 @@ public class MacroChunk {
     private double temperaturaLocal;
     
     public MacroChunk(double altura, long sementeMundo, int yMundo, int xMundo) {
+        this.coordenadaMundialX = xMundo;
+        this.coordenadaMundialY = yMundo;
+        this.semente = GerenciadorDeSemente.gerarSementeMacroChunk(sementeMundo, xMundo, yMundo);
+        this.geracaoAleatoria = new Random(semente);
+
         this.altura = altura;
         this.temperaturaBase = 0;
         this.umidade = 0;
         this.magia = 0;
         this.temperaturaLocal = temperaturaBase;
-        this.coordenadaMundialX = xMundo;
-        this.coordenadaMundialY = yMundo;
-        this.semente = GerenciadorDeSemente.gerarSementeMacroChunk(sementeMundo, xMundo, yMundo);
+        
+        
         this.bioma = null;
         this.pressaoAr = 0;
         this.pressaoX = 0;
         this.pressaoY = 0;
-    }
-
-    public MacroChunk(double altura, double temperaturaBase, double umidade,long sementeMundo, int xMundo, int yMundo, Biomas bioma, double temperaturaLocal) {
-        this.altura = altura;
-        this.temperaturaBase = temperaturaBase;
-        this.umidade = umidade;
-        this.temperaturaLocal = temperaturaLocal;
-        this.coordenadaMundialX = xMundo;
-        this.coordenadaMundialY = yMundo;
-        this.semente = GerenciadorDeSemente.gerarSementeMacroChunk(sementeMundo, xMundo, yMundo);
-        this.bioma = bioma;
     }
 
     public String gerarRelatorio() {
@@ -149,6 +150,14 @@ public class MacroChunk {
 
     public void setMagia(double magia) {
         this.magia = magia;
+    }
+
+    public Random getGeracaoAleatoria() {
+        return geracaoAleatoria;
+    }
+
+    public void setGeracaoAleatoria(Random geracaoAleatoria) {
+        this.geracaoAleatoria = geracaoAleatoria;
     }
 
 }
