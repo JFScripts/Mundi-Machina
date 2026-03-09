@@ -6,7 +6,6 @@ import Mundo.Mundo;
 
 public class ClimaDiario {
     
-    private static int fatorTempo = Tempo.HORA.getQntCiclos();
     public static void simularClima(Mundo mundo){
         double[][] proximaUmidade = new double[mundo.getWidht()][mundo.getHeight()];
         MacroChunk[][] macroChunkAtual = mundo.getMatrizMundo();

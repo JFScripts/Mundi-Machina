@@ -1,11 +1,8 @@
 package Mundo;
 
-import java.util.EnumMap;
-import java.util.Map;
 import java.util.Random;
 
 import Enums.Biomas;
-import Enums.Tempo;
 import Ferramentas.GerenciadorDeSemente;
 
 public class MacroChunk {

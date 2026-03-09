@@ -1,8 +1,6 @@
 package Ferramentas;
 
-import Enums.Biomas;
 import Enums.Tempo;
-import Mundo.MacroChunk;
 import Mundo.Mundo;
 import Simulação.ClimaDiario;
 

@@ -158,7 +158,7 @@ public class DashboardDebug {
                         GerenciadorDeCiclos.simularTickMundo(this.mundo);
                         long ciclo = this.mundo.getCicloMundial();
                         
-                        if (ciclo % 30 == 0) {
+                        if (ciclo % 1000 == 0) {
                             SwingUtilities.invokeLater(() -> {
                                 this.painelInfo.setText(atualizarDadoMundo());
                                 this.mapas = this.gerenciadorDeMapas.GerarMapas(this.mundo);
